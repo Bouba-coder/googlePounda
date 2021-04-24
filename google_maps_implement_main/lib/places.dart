@@ -1,6 +1,7 @@
 //import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_implement/logicClass/addressSuggestionGoogleMap.dart';
 //import 'package:flutter/services.dart';
 import 'package:google_maps_implement/logicClass/geocodingGoogleMap.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -8,12 +9,14 @@ import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'logicClass/addressPredictions.dart';
 //import'dart:ui' as ui;
 
 
 class Places extends StatefulWidget {
-  Places({Key key, this.title}) : super(key: key);
-  final String title;
+  Places({Key? key, this.title}) : super(key: key);
+  late final String? title;
 
   @override
   _PlacesState createState() => _PlacesState();
@@ -26,15 +29,27 @@ class _PlacesState extends State<Places> {
   var _searchBarFloatingController = FloatingSearchBarController();
   var _textInputSearch = TextInputType.text;
   var uuid = new Uuid();
-  String _sessionToken;
+  late String _sessionToken;
   List<dynamic> _placeList = [];
-  String _address = "";
+  late String _address = "";
   LatLng tappedPointLatLng = LatLng(12.24444, 48.200000);
   double latitude = 42.88548214161018;
   double longitude = 2.88548214161018;
   //list for adding marquers
   List<Marker> myMarker = [];
 
+  //customIcon method
+  late BitmapDescriptor customIcon;
+  createMarker(context){
+    if(customIcon == null){
+      ImageConfiguration configuration = createLocalImageConfiguration(context, size:Size(50, 50));
+      BitmapDescriptor.fromAssetImage(configuration, '../lib/image/iconMarker.png').then((iconValue) {
+        setState(() {
+          customIcon = iconValue;
+        });
+      });
+    }
+  }
 
   //add marker method
   _addMarker(LatLng tappedPoint) {
@@ -43,23 +58,28 @@ class _PlacesState extends State<Places> {
       myMarker = [];
       myMarker.add(
           Marker(
-            //icon: BitmapDescriptor.fromBytes(),
+            //icon: customIcon,
             markerId: MarkerId(tappedPoint.toString()),
             position: tappedPoint,
           )
       );
+
     }
     );
     tappedPointLatLng = tappedPoint;
     geocode.longitudeCoordi = tappedPointLatLng.longitude;
     geocode.latitudeCoordi = tappedPointLatLng.latitude;
-    _controller.text = geocode.address;
+    //_controller.text = geocode.address;
+    _searchBarFloatingController.query = geocode.address;
+    //geocode.address = geocode.address;
   }
 
   //calling geocode object
   GeocodingGoogleMapping geocode = new GeocodingGoogleMapping();
+  //calling address suggestion
+  AddressSuggestion suggestionAddress = new AddressSuggestion();
   //calling map...
-  GoogleMapController mapController;
+  late GoogleMapController mapController;
   //final LatLng _center = const LatLng(45.521563, -122.677433);
   CameraPosition _initialPosition = CameraPosition(target: LatLng(48.8854716, 2.3612719), zoom: 20.0);
   void _onMapCreated(GoogleMapController controller) {
@@ -83,7 +103,7 @@ class _PlacesState extends State<Places> {
         _sessionToken = uuid.v4();
       });
     }
-    getSuggestion(_controller.text);
+    //getSuggestion(_searchBarFloatingController.query);
   }
 
   //api call
@@ -92,8 +112,8 @@ class _PlacesState extends State<Places> {
     String PLACES_API_KEY = "AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0";
     //String type = '(regions)';
     String baseURL ='https://maps.googleapis.com/maps/api/place/autocomplete/json';
-    String request =
-        '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$_sessionToken&language=fr';
+    Uri request =
+        '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$_sessionToken&language=fr' as Uri;
     //getting data
 
     var response = await client.get(request);
@@ -109,13 +129,15 @@ class _PlacesState extends State<Places> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    //geocode.fetchSuggestions(_controller.text);
+    //geocode.fetchSuggestions(_searchBarFloatingController.query);
     geocode.fetchAddress(tappedPointLatLng.latitude, tappedPointLatLng.longitude);
+    //customIcon
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: Stack(
         //padding: const EdgeInsets.fromLTRB(8.0, 1.0, 8.0, 0.0),
@@ -129,7 +151,8 @@ class _PlacesState extends State<Places> {
               Marker(
                   markerId: MarkerId('current'),
                   position: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi),
-                  infoWindow: InfoWindow(title: geocode.address)
+                  infoWindow: InfoWindow(title: geocode.address),
+                  //icon: customIcon,
               )
             },
           ),
@@ -147,7 +170,7 @@ class _PlacesState extends State<Places> {
     //print("_searchBarFloatingController : ${_searchBarFloatingController.query}, texteInput : ${_textInputSearch}");
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return FloatingSearchBar(
-      textInputType: _textInputSearch,
+      //textInputType: _textInputSearch,
       controller: _searchBarFloatingController,
       hint: "Search your address",
       openAxisAlignment: 0.0,
@@ -156,11 +179,21 @@ class _PlacesState extends State<Places> {
       scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
       elevation: 4.0,
       onQueryChanged: (query){
-        //calling data methods
-        //query = geocode.address;
-        geocode.fetchSuggestions(query);
-        getSuggestion(query);
-        print("querry : $query");
+        setState(() {
+          //calling data methods
+          //query = geocode.address;
+          //getting lat, long
+          geocode.fetchSuggestions(query);
+          //getting address sugg
+          //getSuggestion(query);
+          suggestionAddress.getSuggestion(query);
+
+
+          print("querry : $query");
+          print("_textInputSearch : ${_textInputSearch}");
+          print("_searchBarFloatingController : ${_searchBarFloatingController.query}");
+        });
+
       },
       //showDrawerHamburger: false,
       transitionCurve: Curves.easeInOut,
@@ -174,7 +207,7 @@ class _PlacesState extends State<Places> {
               onPressed: (){
                 print('places Pressed');
                 //_searchBarFloatingController.query = geocode.address;
-                print('${_searchBarFloatingController.query}');
+                print('_searchBarFloatingController : ${_searchBarFloatingController.query}');
               }),
         ),
 
@@ -198,15 +231,18 @@ class _PlacesState extends State<Places> {
                   ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: _placeList.length,
+                      //itemCount: _placeList.length,
+                      itemCount: suggestionAddress.placeList.length,
                       itemBuilder: (context, index){
                         return ListTile(
                           leading: Text('address'),
-                          title: Text(_placeList[index]["description"]),
-                          subtitle: Text(_placeList[index]["structured_formatting"]["secondary_text"]),
+                          //title: Text(_placeList[index]["description"]),
+                          //subtitle: Text(_placeList[index]["structured_formatting"]["secondary_text"]),
+                          title: Text(suggestionAddress.placeList[index]["description"]),
+                          subtitle: Text(suggestionAddress.placeList[index]["structured_formatting"]["secondary_text"]),
                           onTap: (){
                             setState(() {
-                              geocode.address = _placeList[index]["description"];
+                              geocode.address = suggestionAddress.placeList[index]["description"];
                               mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi), zoom: 18.0)));
                             });
                           },

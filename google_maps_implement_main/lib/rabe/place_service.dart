@@ -28,8 +28,8 @@ class PlaceApiProvider {
     //final request = 'https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0&language=fr&input=pizza+near%20par';
     //final request = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&types=geocode&language=fr&key=$apiKey";
    String baseURL ='https://maps.googleapis.com/maps/api/place/queryautocomplete/json';
-   String request =
-       '$baseURL?input=$input&key=AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0&sessiontoken=$sessionToken&language=fr';
+   Uri request =
+       '$baseURL?input=$input&key=AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0&sessiontoken=$sessionToken&language=fr' as Uri;
 
    final responses = await client.get(request);
     if (responses.statusCode == 200) {

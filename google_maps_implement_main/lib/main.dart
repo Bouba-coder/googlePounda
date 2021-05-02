@@ -13,8 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Google_Map',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        //primarySwatch: Colors.blue,
+        //backgroundColor: Colors.black,
       ),
       home: Places(title: 'Geolocation'),
     );

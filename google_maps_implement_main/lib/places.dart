@@ -1,17 +1,16 @@
 //import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_implement/logicClass/addressSuggestionGoogleMap.dart';
+import 'package:google_maps_implement/logic_class/address_suggestion_googleMap.dart';
 //import 'package:flutter/services.dart';
-import 'package:google_maps_implement/logicClass/geocodingGoogleMap.dart';
+import 'package:google_maps_implement/logic_class/geocoding_googleMap.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'logicClass/addressPredictions.dart';
-import 'logicClass/placeService.dart';
+import 'logic_class/address_predictions.dart';
+import 'logic_class/place_service.dart';
 //import'dart:ui' as ui;
 
 
@@ -84,7 +83,6 @@ class _PlacesState extends State<Places>
     if (_sessionToken == null) {
       setState(() {
         _sessionToken = uuid.v4();
-        geocode.address;
       });
     }
   }
@@ -143,7 +141,7 @@ class _PlacesState extends State<Places>
       elevation: 4.0,
       onQueryChanged: (query) {
         setState(() {
-          pl.fetchSuggestionsPlace(query);
+          //pl.fetchSuggestionsPlace(query);
           //calling data methods
           //getting lat, long
           geocode.fetchSuggestions(query);
@@ -194,9 +192,9 @@ class _PlacesState extends State<Places>
                       itemCount: suggestionAddress.placeList.length,
                       itemBuilder: (context, index){
                         return ListTile(
-                          leading: Text('address', style: TextStyle(color: Colors.black87),),
+                          //leading: Text('address', style: TextStyle(color: Colors.black87),),
                           title: Text(suggestionAddress.placeList[index]["description"], style: TextStyle(color: Colors.white),),
-                          subtitle: Text(suggestionAddress.placeList[index]["structured_formatting"]["secondary_text"], style: TextStyle(color: Colors.black),),
+                          //subtitle: Text(suggestionAddress.placeList[index]["structured_formatting"]["secondary_text"], style: TextStyle(color: Colors.black),),
                           onTap: (){
                             setState(()
                             {

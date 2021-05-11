@@ -56,7 +56,7 @@ class GeocodingGoogleMapping {
     {
       final result = json.decode(responses.body)['results'];
       //print("texte result: $result");
-      print("texteFetchAddressresult: ${result[0]['formatted_address']}");
+      //print("texteFetchAddressresult: ${result[0]['formatted_address']}");
       address = result[0]['formatted_address'];
     }
     else{

@@ -193,12 +193,12 @@ class _PlacesState extends State<Places>
                       itemBuilder: (context, index){
                         return ListTile(
                           //leading: Text('address', style: TextStyle(color: Colors.black87),),
-                          title: Text(suggestionAddress.placeList[index]["description"], style: TextStyle(color: Colors.white),),
+                          title: Text(suggestionAddress.placeList[index].address, style: TextStyle(color: Colors.white),),
                           //subtitle: Text(suggestionAddress.placeList[index]["structured_formatting"]["secondary_text"], style: TextStyle(color: Colors.black),),
                           onTap: (){
                             setState(()
                             {
-                              geocode.address = suggestionAddress.placeList[index]["description"];
+                              geocode.address = suggestionAddress.placeList[index].address;
                               mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi), zoom: 18.0)));
                             });
                           },

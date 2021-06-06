@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_implement/flutter_map.dart';
 import 'package:google_maps_implement/places.dart';
 
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         //backgroundColor: Colors.black,
       ),
       home: Places(title: 'Geolocation'),
+      //home: FlutterMap(),
     );
   }
 }

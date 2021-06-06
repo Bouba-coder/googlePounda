@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
+import 'package:uuid/uuid.dart';
+
+import '../data_class/location.dart';
 
 
-class Suggestion {
-  final String placeId;
-  final String description;
+
+//suggestion class
+class Suggestion
+{
+  late String placeId;
+  late String description;
 
   Suggestion(this.placeId, this.description);
 
@@ -15,38 +21,33 @@ class Suggestion {
   }
 }
 
+
 class PlaceApiProvider {
+
   final client = Client();
-  PlaceApiProvider(this.sessionToken);
-  final sessionToken;
-  static final String androidKey = 'AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0';
-  static final String iosKey = 'AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0';
-  final apiKey = Platform.isAndroid ? androidKey : iosKey;
+  //PlaceApiProvider(this.sessionToken);
+  late final sessionToken;
+  var uuid = new Uuid();
+  final apiKey = 'AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0';
 
-  Future<List<Suggestion>> fetchSuggestions(String input) async {
-   //final request = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&types=address&language=es-ES&components=country:ec&key=$apiKey&sessiontoken=$sessionToken';
-    //final request = 'https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0&language=fr&input=pizza+near%20par';
-    //final request = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&types=geocode&language=fr&key=$apiKey";
-   String baseURL ='https://maps.googleapis.com/maps/api/place/queryautocomplete/json';
-   Uri request =
-       '$baseURL?input=$input&key=AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0&sessiontoken=$sessionToken&language=fr' as Uri;
-
-   final responses = await client.get(request);
-    if (responses.statusCode == 200) {
-      final result = json.decode(responses.body)['predictions'];
-      print("texte: ");
-      print(result);
-      return result;
-      if (result['place_id'] != null) {
+  Future<List<Suggestion>> fetchSuggestionsPlace(String input) async
+  {
+    sessionToken = uuid.v4();
+    final request = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json??input=$input&key=$apiKey&sessiontoken=$sessionToken&language=fr');
+    final response = await client.get(request);
+    print('fetchSuggestionsPlaceService : ${response.body}');
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['status'] == 'OK') {
         // compose suggestions in a list
-        //print(result["predictions"]);
-        print("something");
-        return result['predictions'].map<Suggestion>((p) => Suggestion(p['place_id'], p['description'])).toList();
+        return result['predictions']
+            .map<Suggestion>((p) => Suggestion(p['place_id'], p['description']))
+            .toList();
       }
-      if (result['status'] == 'ZERO_RESULTS') {
-        print("nothing");
+      if (result['status'] == 'ZERO_RESULTS')
+      {
         return [];
-
       }
       throw Exception(result['error_message']);
     } else {
@@ -54,5 +55,39 @@ class PlaceApiProvider {
     }
   }
 
+  Future<Place> getPlaceDetailFromId(String placeId) async {
+    final request =Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=address_component&key=$apiKey&sessiontoken=$sessionToken');
+    final response = await client.get(request);
 
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['status'] == 'OK') {
+        final components =
+        result['result']['address_components'] as List<dynamic>;
+        // build result
+        //final place = Place(street: '', streetNumber: '', zipCode: '', city: '');
+        final place = Place();
+        components.forEach((c) {
+          final List type = c['types'];
+          if (type.contains('street_number')) {
+            place.streetNumber = c['long_name'];
+          }
+          if (type.contains('route')) {
+            place.street = c['long_name'];
+          }
+          if (type.contains('locality')) {
+            place.city = c['long_name'];
+          }
+          if (type.contains('postal_code')) {
+            place.zipCode = c['long_name'];
+          }
+        });
+        return place;
+      }
+      throw Exception(result['error_message']);
+    } else {
+      throw Exception('Failed to fetch suggestion');
+    }
+  }
 }

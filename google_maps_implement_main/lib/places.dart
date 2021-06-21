@@ -44,22 +44,23 @@ class _PlacesState extends State<Places>
   _addMarker(LatLng tappedPoint) {
     print(tappedPoint);
     setState(() {
-      myMarker = [];
-      myMarker.add(
-          Marker(
-            //icon: customIcon,
-            markerId: MarkerId(tappedPoint.toString()),
-            position: tappedPoint,
-          )
-      );
-    }
-    );
     tappedPointLatLng = tappedPoint;
     geocode.longitudeCoordi = tappedPointLatLng.longitude;
     geocode.latitudeCoordi = tappedPointLatLng.latitude;
     _searchBarFloatingController.query = geocode.addressPoint;
     //geocode.address = geocode.address;
     geocode.fetchAddress(tappedPointLatLng.latitude, tappedPointLatLng.longitude);
+      myMarker = [];
+      myMarker.add(
+          Marker(
+            //icon: customIcon,
+            markerId: MarkerId(tappedPoint.toString()),
+            position: tappedPoint,
+            infoWindow: InfoWindow(title: geocode.addressPoint)
+          )
+      );
+    }
+    );
   }
 
   @override
@@ -99,13 +100,11 @@ class _PlacesState extends State<Places>
             mapType: MapType.normal,
             onTap: _addMarker,
             markers: {
-              //Set.from(myMarker)
-              Marker(
-                  markerId: MarkerId(tappedPointLatLng.toString()),
-                  position: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi),
-                  infoWindow: InfoWindow(title: geocode.addressPoint),
-                  //icon: customIcon,
-              )
+              // Marker(
+              //     markerId: MarkerId(tappedPointLatLng.toString()),
+              //     position: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi),
+              //     infoWindow: InfoWindow(title: geocode.addressPoint),
+              // )
             },
           ),
           searchBarWidget(),

@@ -13,16 +13,18 @@ class FloatingSearchBarNativeWidget extends StatelessWidget {
   final double marginTop;
   final Function(String)? onQueryChanged;
   final List<Widget> children;
-  final FloatingSearchBarController floatingSearchBarController;
+  final FloatingSearchBarController? floatingSearchBarController;
+  final Color? backdropColor;
 
 
   //constructor
   const FloatingSearchBarNativeWidget({
     Key? key,
+    required this.children,
+    this.floatingSearchBarController,
+    this.backdropColor,
     this.marginTop = 0,
     this.onQueryChanged,
-    required this.children,
-    required this.floatingSearchBarController,
   }) : super(key: key);
 
   @override
@@ -35,7 +37,7 @@ class FloatingSearchBarNativeWidget extends StatelessWidget {
       automaticallyImplyBackButton: false,
       borderRadius: BorderRadius.circular(20.2),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      backdropColor: Theme.of(context).colorScheme.primary,
+      backdropColor: backdropColor ?? Colors.transparent,
       shadowColor: Theme.of(context).colorScheme.primary,
       margins: EdgeInsets.only(left: 15, right: 15, top: marginTop),
       hint: 'search',

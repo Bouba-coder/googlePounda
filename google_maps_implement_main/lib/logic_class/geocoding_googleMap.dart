@@ -7,10 +7,11 @@ class GeocodingGoogleMapping
   double latitudeCoordi = 0.0;
   double longitudeCoordi = 0.0;
   LatLng geoLatLng = LatLng(0.0, 0.0);
-  String address = "je suis là";
+  String addressPoint ="";
   String apiGeocodingMapKey ="AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0";
   String baseURL ='https://maps.googleapis.com/maps/api/geocode/json';
   final client = new Client();
+
 
   void fetchSuggestions(String input) async
   {
@@ -45,15 +46,15 @@ class GeocodingGoogleMapping
     var responses = await client.get(url);
     //getting responses
     //print("${responses.body}");
-    print("responseFetchAddress : ${responses.body}");
+    //print("responseFetchAddress : ${responses.body}");
     if (responses.statusCode == 200)
     {
       final result = json.decode(responses.body)['results'];
       //print("texte result: $result");
-      //print("texteFetchAddressresult: ${result[0]['formatted_address']}");
-      address = result[0]['formatted_address'];
-      final LocationResultAddress add = LocationResultAddress(address: address);
-      address = add.address;
+      final address = result[0]['formatted_address'];
+      addressPoint = address;
+      print("texteFetchAddressresult: ${addressPoint}");
+
     }
     else
       {

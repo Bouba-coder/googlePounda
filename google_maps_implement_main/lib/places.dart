@@ -57,7 +57,7 @@ class _PlacesState extends State<Places>
     tappedPointLatLng = tappedPoint;
     geocode.longitudeCoordi = tappedPointLatLng.longitude;
     geocode.latitudeCoordi = tappedPointLatLng.latitude;
-    _searchBarFloatingController.query = geocode.address;
+    _searchBarFloatingController.query = geocode.addressPoint;
     //geocode.address = geocode.address;
     geocode.fetchAddress(tappedPointLatLng.latitude, tappedPointLatLng.longitude);
   }
@@ -103,7 +103,7 @@ class _PlacesState extends State<Places>
               Marker(
                   markerId: MarkerId(tappedPointLatLng.toString()),
                   position: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi),
-                  infoWindow: InfoWindow(title: geocode.address),
+                  infoWindow: InfoWindow(title: geocode.addressPoint),
                   //icon: customIcon,
               )
             },
@@ -174,6 +174,7 @@ class _PlacesState extends State<Places>
         return ClipRRect(
           child: Material(
             color: Colors.white.withOpacity(0.3),
+            elevation: 4.0,
             child: Container(
               //height: 200.0,
               color: Colors.black.withOpacity(0.6),
@@ -193,12 +194,11 @@ class _PlacesState extends State<Places>
                             print("je clique");
                             setState(()
                             {
-
                               mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi), zoom: 18.0)));
                               _addMarker(LatLng(geocode.latitudeCoordi, geocode.longitudeCoordi));
                               //geocode.address = suggestionAddress.placeList[index].address;
-                              geocode.address = suggestionAddress.placeList[index].address;
-                              geocode.fetchSuggestions(geocode.address);
+                              geocode.addressPoint = suggestionAddress.placeList[index].address;
+                              geocode.fetchSuggestions(geocode.addressPoint);
                             });
                             suggestionAddress.placeList.clear();
                           },
@@ -227,7 +227,7 @@ class _PlacesState extends State<Places>
           borderRadius: BorderRadius.circular(10.1),
         ),
         //child: Text("${tappedPointLatLng.latitude}, ${tappedPointLatLng.longitude}"),
-        child: Text("${geocode.latitudeCoordi}, ${geocode.longitudeCoordi}, ${geocode.address}", style: TextStyle(color: Colors.white, fontSize: 14.1),),
+        child: Text("${geocode.latitudeCoordi}, ${geocode.longitudeCoordi}, ${geocode.addressPoint}", style: TextStyle(color: Colors.white, fontSize: 14.1),),
       ),
     );
   }

@@ -30,15 +30,43 @@ class AddressSuggestion {
         final element = prediction;
         final place_id = element['place_id'];
         final description = element['description'];
-        final LocationResultAddress locationResultAddress = LocationResultAddress(address: description, placeId: place_id);
+        final LocationResultAddress locationResultAddress = new LocationResultAddress(address: description, placeId: place_id);
         //locationResultAddress.placeId = place_id;
+        print("geoLatLng : ${description}");
         placeList.add(locationResultAddress);
       }
     }
   }
 
+  //future
+  Future<List<LocationResultAddress>>getFuture(String input) async {
+    var uuid = new Uuid();
+    var sessionToken = uuid.v4();
+    String apiKey ="AIzaSyBKKc8CuRH_wZG7xBXZhvkpo_oRMzMMRp0";
+    String baseURL ='https://maps.googleapis.com/maps/api/place/autocomplete/json';
+    final client = new Client();
+    //getting data
+    var url = Uri.parse(
+        '$baseURL?input=$input&key=$apiKey&sessiontoken=$sessionToken&language=fr');
+    var responses = await client.get(url);
+
+      for (var prediction in json.decode(responses.body)['predictions'])
+      {
+        final element = prediction;
+        final place_id = element['place_id'];
+        final description = element['description'];
+        final LocationResultAddress locationResultAddress = LocationResultAddress(address: description, placeId: place_id);
+        //locationResultAddress.placeId = place_id;
+        print("geoLatLng : ${description}");
+        placeList.add(locationResultAddress);
+
+      }
+    return placeList;
+  }
+
   //getPlaceDetailFromId more informations about place
-    Future<Place> getPlaceDetailFromId(String placeId) async {
+    //Future<Place> getPlaceDetailFromId(String placeId) async {
+    getPlaceDetailFromId(String placeId) async {
       sessionToken = uuid.v4();
       final request = Uri.parse('$baseURLDetails=$placeId&fields=address_component&key=$apiKey&sessiontoken=$sessionToken');
       final response = await client.get(request);

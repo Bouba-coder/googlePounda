@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_implement/flutter_map.dart';
 import 'package:google_maps_implement/places.dart';
+import 'package:google_maps_implement/ui_class/floating_search_bar.dart';
+
 
 
 void main() {
@@ -18,8 +19,8 @@ class MyApp extends StatelessWidget {
         //primarySwatch: Colors.blue,
         //backgroundColor: Colors.black,
       ),
-      home: Places(title: 'Geolocation'),
-      //home: FlutterMap(),
+      //home: Places(title: 'Geolocation'),
+      home: MySearchBar(),
     );
   }
 }

@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Google_Map',
+      debugShowCheckedModeBanner:  false,
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //primarySwatch: Colors.blue,

@@ -17,16 +17,13 @@ class _WebState extends State<Web> {
   late FloatingSearchBarController _floatingSearchBarController;
 
   CameraPosition _cameraPosition = CameraPosition(target: LatLng(28.385233, -81.563873), zoom: 10);
-  Marker _marker = Marker(markerId: MarkerId('start'));
 
   Geocoding _geocoding = Geocoding();
   Places _places = Places();
   String _address = "";
 
-  List<LocationResultAddress> locations = [];
-  LatLng latLng = LatLng(0.0, 0.0);
-
-
+  List<LocationResultAddress> _locations = [];
+  LatLng _latLng = LatLng(28.385233, -81.563873);
 
   @override
   void initState() {
@@ -37,6 +34,7 @@ class _WebState extends State<Web> {
   @override
   void dispose() {
     _floatingSearchBarController.dispose();
+    _googleMapController.dispose();
     super.dispose();
   }
 
@@ -54,34 +52,38 @@ class _WebState extends State<Web> {
           mapType: MapType.normal,
           onTap: (latLng) async{
             _address = (await _geocoding.findAddress(latLng.latitude, latLng.longitude))!;
+            // TODO : find a way to move the marker only when navigating;
           },
           markers: {
-            _marker
+            Marker(markerId: MarkerId(_address) , position: _latLng, infoWindow: InfoWindow(title: _address))
           },
         ),
-        // FloatingSearchBarWidget(
-        //     floatingSearchBarController: _floatingSearchBarController,
-        //     onQueryChanged: (query) async{
-        //       locations = (await _places.getSuggestions(query))!;
-        //     },
-        //     children: [
-        //         ListView.builder(
-        //             itemCount: locations.length,
-        //             itemBuilder: (context, index){
-        //           final item = locations[index];
-        //           return SizedBox();
-        //           return ListTile(
-        //             title: Text(item.address),
-        //             onTap: (){
-        //               setState(() async{
-        //                 latLng = (await _geocoding.getCoordinates(item.address))!;
-        //                 _address = (await  _geocoding.findAddress(latLng.latitude, latLng.longitude))!;
-        //                 _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(latLng.latitude, latLng.longitude), zoom: 15.0)));
-        //               });
-        //             },
-        //           );
-        //         })
-        // ])
+        FloatingSearchBarWidget(
+            floatingSearchBarController: _floatingSearchBarController,
+            onQueryChanged: (query) async{
+              setState(() {
+                _places.getSuggestions(query).then((value) => _locations = value!);
+              });
+            },
+            children: [
+                ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _locations.length,
+                    itemBuilder: (context, index){
+                  final item = _locations[index];
+                  return ListTile(
+                    title: Text(item.address),
+                    onTap: (){
+                      setState(() async{
+                        _floatingSearchBarController.close();
+                        _latLng = (await _geocoding.getCoordinates(item.address))!;
+                        _address = (await  _geocoding.findAddress(_latLng.latitude, _latLng.longitude))!;
+                        _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(_latLng.latitude, _latLng.longitude), zoom: 15.0)));
+                      });
+                    },
+                  );
+                })
+        ])
       ],
     );
   }

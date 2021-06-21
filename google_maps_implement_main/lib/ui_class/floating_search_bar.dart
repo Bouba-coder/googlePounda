@@ -92,7 +92,8 @@ class _MySearchBarState extends State<MySearchBar> {
   AddressSuggestion address = new AddressSuggestion();
   //geocode
   GeocodingGoogleMapping getGeocode = new GeocodingGoogleMapping();
-  List places = [];
+
+  //map camera
   CameraPosition initialPosition = CameraPosition(target: LatLng(0.0, 0.0), zoom: 3.0,);
   void _onMapCreated(GoogleMapController controller)
   {
@@ -102,22 +103,20 @@ class _MySearchBarState extends State<MySearchBar> {
   //google map adding marker after clicked
   _addMarker(LatLng tappedPoint) {
     setState(() {
+      getGeocode.fetchAddress(tappedPoint.latitude, tappedPoint.longitude);
       myMarker = [];
       myMarker.add(
           Marker(
             markerId: MarkerId(tappedPoint.toString()),
             position: tappedPoint,
+            infoWindow: InfoWindow(title: getGeocode.addressPoint)
           )
       );
       startPoint = tappedPoint;
-    }
-    );
-    print(" tappedPoint : $tappedPoint");
-    setState(() {
-      getGeocode.fetchAddress(tappedPoint.latitude, tappedPoint.longitude);
+    });
+      print(" tappedPoint : $tappedPoint");
       print("geocoding address ${getGeocode.addressPoint}");
       presentation = getGeocode.addressPoint;
-    });
 
   }
 
@@ -150,11 +149,12 @@ class _MySearchBarState extends State<MySearchBar> {
             mapType: MapType.normal,
             onTap: _addMarker,
             markers: {
-              //Set.from(myMarker)
+
               Marker(
                 markerId: MarkerId(startPoint.toString()),
                 position: LatLng(startPoint.latitude, startPoint.longitude),
-                infoWindow: InfoWindow(title: presentation),
+                //infoWindow: InfoWindow(title: presentation),
+                infoWindow: InfoWindow(title: getGeocode.addressPoint),
                 //icon: customIcon,
               )
             },
@@ -165,14 +165,10 @@ class _MySearchBarState extends State<MySearchBar> {
               new ListView.builder(
                   shrinkWrap: true,
                   itemCount: address.placeList.length,
-                  //itemCount: places.length,
-                  //itemCount: 10,
                   itemBuilder: (context, index)
                   {
                     return ListTile(
                       title: new Text("${address.placeList[index].address.toString()}"),
-                      //title: Text("${places[index].address.toString()}"),
-                      //title: Text("toto"),
                       onTap: (){
                         print("je clicke");
                         setState(() {
@@ -199,7 +195,6 @@ class _MySearchBarState extends State<MySearchBar> {
           print("query : $query");
           setState(() {
             address.getSuggestion(query );
-            places = address.placeList;
           });
         },
         ),

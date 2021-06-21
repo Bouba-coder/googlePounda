@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_implement/architecture/presentation/location_picker_page.dart';
-import 'package:google_maps_implement/places.dart';
-import 'package:google_maps_implement/ui_class/floating_search_bar.dart';
 
 
 

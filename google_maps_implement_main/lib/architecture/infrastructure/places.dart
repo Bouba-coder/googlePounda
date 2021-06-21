@@ -1,5 +1,4 @@
-
-import 'package:google_maps_implement/data_class/location.dart';
+import 'package:google_maps_implement/architecture/domain/geolocation.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
@@ -39,13 +38,10 @@ class Places {
     if (response.statusCode == 200)
     {
       final result = json.decode(response.body);
-      //print('getPlaceDetailFromId : $result');
       if (result['status'] == 'OK')
       {
         final components = result['result']['address_components'] as List<dynamic> ;
-        // build result
         final place = Place();
-        //recuperation de details avec le placeid
         components.forEach((c)
         {
           final List type = c['types'];

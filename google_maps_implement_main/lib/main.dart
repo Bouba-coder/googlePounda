@@ -8,18 +8,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Google_Map',
-      debugShowCheckedModeBanner:  false,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        //primarySwatch: Colors.blue,
-        //backgroundColor: Colors.black,
       ),
-      //home: Places(title: 'Geolocation'),
       home: LocationPickerPage(),
     );
   }

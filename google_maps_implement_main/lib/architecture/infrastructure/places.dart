@@ -20,7 +20,6 @@ class Places {
         for (var prediction in json.decode(response.body)['predictions'])
         {
           final LocationResultAddress locationResultAddress = new LocationResultAddress(address: prediction['description'], placeId: prediction['place_id']);
-          //locationResultAddress.placeId = place_id;
           l.add(locationResultAddress);
         }
         return l;

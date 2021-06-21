@@ -6,22 +6,23 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 
 class FloatingSearchBarWidget extends StatelessWidget {
-  //variables
+
   final double marginTop;
   final Function(String)? onQueryChanged;
   final List<Widget> children;
   final FloatingSearchBarController? floatingSearchBarController;
-  final Color? backdropColor;
+  final Color? backdropColor, backgroundColor, iconColor, accentColor;
 
-
-  //constructor
   const FloatingSearchBarWidget({
     Key? key,
     required this.children,
     this.floatingSearchBarController,
     this.backdropColor,
-    this.marginTop = 0,
+    this.backgroundColor,
+    this.iconColor,
+    this.accentColor,
     this.onQueryChanged,
+    this.marginTop = 0,
   }) : super(key: key);
 
   @override
@@ -33,7 +34,9 @@ class FloatingSearchBarWidget extends StatelessWidget {
       controller: floatingSearchBarController,
       automaticallyImplyBackButton: false,
       borderRadius: BorderRadius.circular(20.2),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      iconColor: iconColor,
+      accentColor: accentColor,
+      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       backdropColor: backdropColor ?? Colors.transparent,
       shadowColor: Theme.of(context).colorScheme.primary,
       margins: EdgeInsets.only(left: 15, right: 15, top: marginTop),
@@ -44,7 +47,7 @@ class FloatingSearchBarWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
-      openWidth: isPortrait ? 600 : 500,
+      openWidth: MediaQuery.of(context).size.width,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: onQueryChanged,
       // Specify a custom transition to be used for

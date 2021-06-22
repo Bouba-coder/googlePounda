@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter_web/google_maps_flutter_web.dart' as web;
 import 'package:google_maps_implement/architecture/domain/geolocation.dart';
 import 'package:google_maps_implement/architecture/infrastructure/geocoding.dart';
 import 'package:google_maps_implement/architecture/infrastructure/places.dart';
@@ -39,58 +38,76 @@ class _WebState extends State<Web> {
   }
 
 
-  _updatePosition(latLng){
+  _updatePosition(LatLng latLng) async{
+    _latLng = latLng;
+    _address = (await _geocoding.findAddress(latLng.latitude, latLng.longitude))!;
+    setState(() {});
+  }
+
+  _updatePositionOnSelect(LocationResultAddress item) async {
+    _floatingSearchBarController.close();
+    _latLng = (await _geocoding.getCoordinates(item.address))!;
+    _address = (await  _geocoding.findAddress(_latLng.latitude, _latLng.longitude))!;
+    _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _latLng, zoom: 20.0)));
+    setState(() {});
+  }
+
+  _onQueryChanged(query) async{
+    _locations = (await _places.getSuggestions(query))!;
+    setState(() {});
+  }
+
+  _onMapCreated(GoogleMapController controller) {
     setState(() {
-      _latLng = latLng;
-      _geocoding.findAddress(latLng.latitude, latLng.longitude).then((value) => _address = value!);
+      _googleMapController = controller;
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GoogleMap(
-          initialCameraPosition: _cameraPosition,
-          onMapCreated: (controller) {
-            setState(() {
-            _googleMapController = controller;
-            });
-          },
-          mapType: MapType.normal,
-          onTap: _updatePosition,
-          markers: {
-            Marker(markerId: MarkerId(_address) , position: LatLng(_latLng.latitude, _latLng.longitude), infoWindow: InfoWindow(title: _address))
-          },
-        ),
-        FloatingSearchBarWidget(
-            floatingSearchBarController: _floatingSearchBarController,
-            onQueryChanged: (query) {
-              setState(() {
-                _places.getSuggestions(query).then((value) => _locations = value!);
-              });
+    return SafeArea(
+      child: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: _cameraPosition,
+            onMapCreated: _onMapCreated,
+            mapType: MapType.normal,
+            onTap: _updatePosition,
+            markers: {
+              Marker(markerId: MarkerId(_address) , position: LatLng(_latLng.latitude, _latLng.longitude), infoWindow: InfoWindow(title: _address))
             },
-            children: [
-                ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _locations.length,
-                    itemBuilder: (context, index){
-                  final item = _locations[index];
-                  return ListTile(
-                    title: Text(item.address),
-                    onTap: (){
-                      setState(() async{
-                        _floatingSearchBarController.close();
-                        _latLng = (await _geocoding.getCoordinates(item.address))!;
-                        _address = (await  _geocoding.findAddress(_latLng.latitude, _latLng.longitude))!;
-                        _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _latLng, zoom: 20.0)));
-                      });
-                    },
-                  );
-                })
-        ])
-      ],
+          ),
+          FloatingSearchBarWidget(
+            marginTop: 10,
+              floatingSearchBarController: _floatingSearchBarController,
+              onQueryChanged: _onQueryChanged,
+              children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _locations.length,
+                      itemBuilder: (context, index){
+                    final item = _locations[index];
+                    return ListTile(
+                      title: Text(item.address),
+                      onTap: (){
+                        _updatePositionOnSelect(item);
+                      },
+                    );
+                  })
+          ]),
+          Positioned(
+            bottom: 60,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              width: MediaQuery.of(context).size.width,
+                height: 100,
+                child: Card(
+                  color: Colors.black,
+                  elevation: 4,
+                  child: Center(child: Text(_address, style: TextStyle(color: Colors.white),),),)),
+          )
+        ],
+      ),
     );
   }
 }

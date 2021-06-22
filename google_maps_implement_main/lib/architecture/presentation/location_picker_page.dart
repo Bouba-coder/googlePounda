@@ -15,7 +15,7 @@ class LocationPickerPage extends StatelessWidget {
   }
 
   Widget _buildPlatformUI() {
-    if (kIsWeb) {
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
       return Web();
     } else if (Platform.isAndroid || Platform.isIOS) {
       return Mobile();

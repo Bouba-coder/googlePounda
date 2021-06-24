@@ -1,7 +1,9 @@
-import 'package:google_maps_implement/architecture/domain/geolocation.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
+
+import '../domain/geolocation.dart';
 
 class Places {
 
@@ -17,9 +19,9 @@ class Places {
       if (response.statusCode == 200)
       {
         List<LocationResultAddress> l = [];
-        for (var prediction in json.decode(response.body)['predictions'])
+        for (final prediction in json.decode(response.body)['predictions'])
         {
-          final LocationResultAddress locationResultAddress = new LocationResultAddress(address: prediction['description'], placeId: prediction['place_id']);
+          final LocationResultAddress locationResultAddress = LocationResultAddress(address: prediction['description'] as String, placeId: prediction['place_id'] as String);
           l.add(locationResultAddress);
         }
         return l;
@@ -41,24 +43,24 @@ class Places {
       {
         final components = result['result']['address_components'] as List<dynamic> ;
         final place = Place();
-        components.forEach((c)
+        components.map((c)
         {
-          final List type = c['types'];
+          final List type = c['types'] as List<dynamic>;
           if (type.contains('street_number'))
           {
-            place.streetNumber = c['long_name'];
+            place.streetNumber = c['long_name'] as String;
           }
           if (type.contains('route'))
           {
-            place.street = c['long_name'];
+            place.street = c['long_name'] as String;
           }
           if (type.contains('locality'))
           {
-            place.city = c['long_name'];
+            place.city = c['long_name'] as String;
           }
           if (type.contains('postal_code'))
           {
-            place.zipCode = c['long_name'];
+            place.zipCode = c['long_name'] as String;
           }
         });
         return place;

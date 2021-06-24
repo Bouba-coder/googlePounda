@@ -33,14 +33,14 @@ class FloatingSearchBarWidget extends StatelessWidget {
     return FloatingSearchBar(
       controller: floatingSearchBarController,
       automaticallyImplyBackButton: false,
-      borderRadius: BorderRadius.circular(20.2),
+      borderRadius: BorderRadius.circular(10),
       iconColor: iconColor,
       accentColor: accentColor,
-      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
       backdropColor: backdropColor ?? Colors.transparent,
       shadowColor: Theme.of(context).colorScheme.primary,
       margins: EdgeInsets.only(left: 15, right: 15, top: marginTop),
-      hint: 'search',
+      hint: '',
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 800),
       transitionCurve: Curves.easeInOut,
@@ -58,12 +58,12 @@ class FloatingSearchBarWidget extends StatelessWidget {
       ],
       actions: [FloatingSearchBarAction.searchToClear()],
       builder: (context, transition) {
-        return new ClipRRect(
+        return ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            // color: Colors.white,
+            color:  Theme.of(context).primaryColor,
             elevation: 4.0,
-            child: new Column(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: children,
             ),

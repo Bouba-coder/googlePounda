@@ -1,7 +1,8 @@
 
+import 'dart:convert';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class Geocoding{
 
@@ -14,7 +15,7 @@ class Geocoding{
       final response = await http.get(url);
       if(response.statusCode == 200){
         final result = json.decode(response.body)['results'];
-        LatLng latLng = LatLng(result[0]['geometry']['location']['lat'], result[0]['geometry']['location']['lng']);
+        final LatLng latLng = LatLng(result[0]['geometry']['location']['lat'] as double, result[0]['geometry']['location']['lng'] as double);
         return latLng;
       }
       return null;
@@ -30,7 +31,7 @@ class Geocoding{
       final response = await http.get(url);
       if (response.statusCode == 200){
         final result = json.decode(response.body)['results'];
-        return result[0]['formatted_address'];
+        return result[0]['formatted_address'] as String;
       }
       return null;
     }catch (e){

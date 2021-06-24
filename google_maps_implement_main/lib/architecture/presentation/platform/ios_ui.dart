@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_implement/architecture/presentation/platform/core/example.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 import '../../domain/geolocation.dart';
@@ -43,11 +44,13 @@ class _IosUIState extends State<IosUI> {
 
 
   void _getCurrentLocation() async{
-    final Position p = await Geolocator().determinePosition();
-    _latLng = LatLng(p.latitude, p.longitude);
-    _address = (await _geocoding.findAddress(_latLng.latitude, _latLng.longitude))!;
-    _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _latLng, zoom: 20.0)));
-    setState(() {});
+    final Example example = Example();
+    ModelDvo modelDvo = await example.getCurrentLocation(() => setState(() {}));
+    // final Position p = await Geolocator().determinePosition();
+    // _latLng = LatLng(p.latitude, p.longitude);
+    // _address = (await _geocoding.findAddress(_latLng.latitude, _latLng.longitude))!;
+    // _googleMapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _latLng, zoom: 20.0)));
+    // setState(() {});
   }
 
   void _updatePosition(LatLng latLng) async{
